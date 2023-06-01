@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import vars from '../config/config';
+import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import moment from 'moment';
 import {
@@ -11,7 +12,6 @@ import {
   Input,
   Select,
   MenuItem,
-  createTheme,
 } from '@mui/material';
 import { get, post } from '../hooks/fetch';
 import useSWR, { mutate } from 'swr';
@@ -95,9 +95,17 @@ const HomePage: React.FC = () => {
 
   // noinspection TypeScriptValidateTypes
   return (
-    <div>
+    <div style={{ display: 'flex', margin: '1vh' }}>
       <div style={{ height: '100vh', width: '103vh' }}>
-        <Button onClick={() => setOpenModal(true)}>Add Transaction</Button>
+        <Button
+          startIcon={<AddIcon />}
+          variant="outlined"
+          color="success"
+          onClick={() => setOpenModal(true)}
+          style={{ marginBottom: '1vh', marginTop: '1vh' }}
+        >
+          New Transaction
+        </Button>
         <DataGrid
           rows={transactions ?? []}
           columns={columns}
@@ -195,8 +203,11 @@ const HomePage: React.FC = () => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setOpenModal(false)}>Cancel</Button>
+          <Button color="error" onClick={() => setOpenModal(false)}>
+            Cancel
+          </Button>
           <Button
+            color="success"
             onClick={() => handleCreateTransaction(transactionCreateValues)}
           >
             Create

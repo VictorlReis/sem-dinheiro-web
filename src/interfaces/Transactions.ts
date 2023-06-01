@@ -1,5 +1,3 @@
-import moment from 'moment/moment';
-
 export interface Transaction {
   id: number;
   description: string;
