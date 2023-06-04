@@ -10,18 +10,18 @@ import {
 } from '@mui/x-data-grid';
 import moment from 'moment';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Input,
-  Select,
-  MenuItem,
-  IconButton,
-  DialogContentText,
-  SelectChangeEvent,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Input,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
 } from '@mui/material';
 import { get, post, put, remove } from '../hooks/fetch';
 import useSWR, { mutate } from 'swr';
@@ -33,6 +33,7 @@ import {
 import { toast } from 'react-toastify';
 import DateFilter from '../components/DateFilterComponent';
 import CurrencyTextField from '../components/CurrencyTextField';
+import CustomChart from '../components/CustomChartComponent';
 
 const HomePage: React.FC = () => {
   const initialTransactionCreateValues: CreateTransactionValues = {
@@ -59,13 +60,30 @@ const HomePage: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [transactionIdToDelete, setTransactionIdToDelete] = useState(0);
-
   const [filteredTransactions, setFilteredTransactions] = useState<
     GridRowsProp<Transaction> | undefined
   >(transactions);
-
   const [transactionCreateValues, setTransactionCreateValues] =
     useState<CreateTransactionValues>(initialTransactionCreateValues);
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    if (transactions) {
+      const tagValues = transactions.reduce((acc, transaction) => {
+        if (!acc[transaction.tag]) {
+          acc[transaction.tag] = 0;
+        }
+        acc[transaction.tag] += transaction.value;
+        return acc;
+      }, {});
+
+      const data = Object.entries(tagValues).map(([tag, value]) => ({
+        tag,
+        value,
+      }));
+      setChartData(data);
+    }
+  }, [transactions]);
 
   const handleCreateTransaction = async (
     formValues: CreateTransactionValues,
@@ -137,11 +155,7 @@ const HomePage: React.FC = () => {
   ) => {
     const { field, row } = params;
     const value = (event as { target: { value: unknown } }).target.value;
-    console.log(params);
     row[field] = value;
-
-    console.log(row, 'row');
-
     try {
       await put(`transaction`, row, vars.uri);
       toast.success('Transaction updated successfully');
@@ -207,35 +221,38 @@ const HomePage: React.FC = () => {
   // noinspection TypeScriptValidateTypes
   return (
     <div style={{ margin: '1vh' }}>
-      <div style={{}}>
-        <Button
-          startIcon={<AddIcon />}
-          variant="outlined"
-          color="success"
-          onClick={() => setOpenModal(true)}
-          style={{ marginBottom: '1vh', marginTop: '1vh' }}
-        >
-          New Transaction
-        </Button>
-        <DataGrid
-          rows={filteredTransactions ?? []}
-          columns={columns}
-          pageSize={10}
-          columnBuffer={1}
-          sx={{
-            marginBottom: '1vh',
-            width: '100%',
-            height: 'auto',
-            maxWidth: '130vh',
-          }}
-          onCellEditStop={handleEditCellChange}
-        />
-        <DateFilter
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onChangeMonth={handleMonthFilterChange}
-          onChangeYear={handleYearFilterChange}
-        />
+      <Button
+        startIcon={<AddIcon />}
+        variant="outlined"
+        color="success"
+        onClick={() => setOpenModal(true)}
+        style={{ marginBottom: '1vh', marginTop: '1vh' }}
+      >
+        New Transaction
+      </Button>
+      <div style={{ display: 'flex' }}>
+        <div>
+          <DataGrid
+            rows={filteredTransactions ?? []}
+            columns={columns}
+            pageSize={10}
+            columnBuffer={1}
+            sx={{
+              marginBottom: '1vh',
+              width: '100%',
+              height: 'auto',
+              maxWidth: '130vh',
+            }}
+            onCellEditStop={handleEditCellChange}
+          />
+          <DateFilter
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onChangeMonth={handleMonthFilterChange}
+            onChangeYear={handleYearFilterChange}
+          />
+        </div>
+        <CustomChart data={chartData} />
       </div>
       <Dialog
         open={openModal}
@@ -299,24 +316,12 @@ const HomePage: React.FC = () => {
               variant="outlined"
               value={transactionCreateValues.value}
               onValueChange={(values) => {
-                console.log(values, 'teste values');
                 setTransactionCreateValues((prevValues) => ({
                   ...prevValues,
                   value: values.floatValue ?? prevValues.value,
                 }));
               }}
             />
-            {/*<Input*/}
-            {/*  type="text"*/}
-            {/*  value={transactionCreateValues.value}*/}
-            {/*  onChange={(e) =>*/}
-            {/*    setTransactionCreateValues((prevValues) => ({*/}
-            {/*      ...prevValues,*/}
-            {/*      value: parseFloat(e.target.value),*/}
-            {/*    }))*/}
-            {/*  }*/}
-            {/*  placeholder="Value"*/}
-            {/*/>*/}
             <Select
               sx={{ marginTop: '2vh', height: '4vh' }}
               onChange={(e) =>
