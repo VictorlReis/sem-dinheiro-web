@@ -3,6 +3,8 @@
 import React from 'react';
 import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import moment from 'moment';
+import 'moment/locale/pt-br.js';
+moment.locale('pt-br');
 
 interface DateFilterProps {
   selectedMonth: number;
@@ -17,6 +19,20 @@ const DateFilter: React.FC<DateFilterProps> = ({
   onChangeMonth,
   onChangeYear,
 }) => {
+  const translatedMonths = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
+  ];
   const currentYear = moment().year();
   const startYear = currentYear - 10;
   return (
@@ -26,9 +42,9 @@ const DateFilter: React.FC<DateFilterProps> = ({
         onChange={onChangeMonth}
         style={{ marginRight: '1vh', height: '4vh' }}
       >
-        {moment.months().map((month, index) => (
+        {translatedMonths.map((mes, index) => (
           <MenuItem key={index + 1} value={index + 1}>
-            {month}
+            {mes}
           </MenuItem>
         ))}
       </Select>

@@ -28,11 +28,10 @@ const CustomChart = ({ data }) => {
   };
 
   const colorMap = {
-    ifood: '#a13131', // red
-    casa: 'rgb(83,124,83)', // green
-    academia: '#0000ff', // blue
+    ifood: '#a13131',
+    casa: 'rgb(83,124,83)',
+    academia: '#0000ff',
     educacao: '#3c3c70',
-    // Add more tags as needed...
   };
 
   const defaultColor = '#808080';

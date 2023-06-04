@@ -10,7 +10,6 @@ import {
 } from '@mui/x-data-grid';
 import moment from 'moment';
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -18,9 +17,6 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
-  Input,
-  MenuItem,
-  Select,
   SelectChangeEvent,
 } from '@mui/material';
 import { get, post, put, remove } from '../hooks/fetch';
@@ -32,8 +28,8 @@ import {
 } from '../interfaces/Transactions';
 import { toast } from 'react-toastify';
 import DateFilter from '../components/DateFilterComponent';
-import CurrencyTextField from '../components/CurrencyTextField';
 import CustomChart from '../components/CustomChartComponent';
+import CreateTransactionModal from '../components/CreateTransactionModalComponent';
 
 const HomePage: React.FC = () => {
   const initialTransactionCreateValues: CreateTransactionValues = {
@@ -57,7 +53,8 @@ const HomePage: React.FC = () => {
     },
   );
 
-  const [openModal, setOpenModal] = useState(false);
+  const [openCreateTransactionModal, setOpenCreateTransactionModal] =
+    useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [transactionIdToDelete, setTransactionIdToDelete] = useState(0);
   const [filteredTransactions, setFilteredTransactions] = useState<
@@ -100,7 +97,7 @@ const HomePage: React.FC = () => {
       console.error('Error creating transaction:', error);
     }
 
-    setOpenModal(false);
+    setOpenCreateTransactionModal(false);
   };
 
   const confirmDeleteTransaction = async () => {
@@ -154,8 +151,7 @@ const HomePage: React.FC = () => {
     event: any,
   ) => {
     const { field, row } = params;
-    const value = (event as { target: { value: unknown } }).target.value;
-    row[field] = value;
+    row[field] = (event as { target: { value: unknown } }).target.value;
     try {
       await put(`transaction`, row, vars.uri);
       toast.success('Transaction updated successfully');
@@ -169,14 +165,14 @@ const HomePage: React.FC = () => {
   const columns: GridColDef[] = [
     {
       field: 'description',
-      headerName: 'Description',
+      headerName: 'Descrição',
       width: 200,
       editable: true,
     },
     { field: 'type', headerName: 'Type', width: 150, editable: true },
     {
       field: 'startDate',
-      headerName: 'Date',
+      headerName: 'Data',
       width: 150,
       editable: true,
       type: 'date',
@@ -184,14 +180,14 @@ const HomePage: React.FC = () => {
     },
     {
       field: 'paymentMethod',
-      headerName: 'Payment Method',
+      headerName: 'Método de pagamento',
       width: 150,
       editable: true,
     },
     { field: 'tag', headerName: 'Tag', width: 150, editable: true },
     {
       field: 'value',
-      headerName: 'Value',
+      headerName: 'Valor',
       width: 150,
       editable: true,
       valueFormatter: (params) =>
@@ -202,7 +198,7 @@ const HomePage: React.FC = () => {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: '',
       width: 150,
       renderCell: (params) => (
         <IconButton
@@ -225,10 +221,10 @@ const HomePage: React.FC = () => {
         startIcon={<AddIcon />}
         variant="outlined"
         color="success"
-        onClick={() => setOpenModal(true)}
+        onClick={() => setOpenCreateTransactionModal(true)}
         style={{ marginBottom: '1vh', marginTop: '1vh' }}
       >
-        New Transaction
+        Nova Transação
       </Button>
       <div style={{ display: 'flex' }}>
         <div>
@@ -254,102 +250,24 @@ const HomePage: React.FC = () => {
         </div>
         <CustomChart data={chartData} />
       </div>
-      <Dialog
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        display="flex"
-      >
-        <DialogTitle>Create Transaction</DialogTitle>
-        <DialogContent>
-          <Box display="grid" gridgap="10vh">
-            <Input
-              type="text"
-              value={transactionCreateValues.description}
-              onChange={(e) =>
-                setTransactionCreateValues((prevValues) => ({
-                  ...prevValues,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Description"
-            />
-            <Input
-              type="date"
-              value={transactionCreateValues.startDate}
-              onChange={(e) =>
-                setTransactionCreateValues((prevValues) => ({
-                  ...prevValues,
-                  startDate: e.target.value,
-                }))
-              }
-              sx={{ marginTop: '2vh' }}
-              placeholder="Start Date"
-            />
-            <Input
-              label="Payment Method"
-              type="text"
-              value={transactionCreateValues.paymentMethod}
-              onChange={(e) =>
-                setTransactionCreateValues((prevValues) => ({
-                  ...prevValues,
-                  paymentMethod: e.target.value,
-                }))
-              }
-              sx={{ marginTop: '2vh' }}
-              placeholder="Payment Method"
-            />
-            <Input
-              type="text"
-              value={transactionCreateValues.tag}
-              onChange={(e) =>
-                setTransactionCreateValues((prevValues) => ({
-                  ...prevValues,
-                  tag: e.target.value,
-                }))
-              }
-              sx={{ marginTop: '2vh' }}
-              placeholder="Tag"
-            />
-            <CurrencyTextField
-              id="value"
-              placeholder="Value"
-              variant="outlined"
-              value={transactionCreateValues.value}
-              onValueChange={(values) => {
-                setTransactionCreateValues((prevValues) => ({
-                  ...prevValues,
-                  value: values.floatValue ?? prevValues.value,
-                }));
-              }}
-            />
-            <Select
-              sx={{ marginTop: '2vh', height: '4vh' }}
-              onChange={(e) =>
-                setTransactionCreateValues((prevValues) => ({
-                  ...prevValues,
-                  type: parseInt(e.target.value),
-                }))
-              }
-              value={transactionCreateValues.type}
-              placeholder="Type"
-            >
-              <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
-              <MenuItem value={TransactionType.Income}>Income</MenuItem>
-            </Select>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button color="error" onClick={() => setOpenModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            color="success"
-            onClick={() => handleCreateTransaction(transactionCreateValues)}
-          >
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CreateTransactionModal
+        open={openCreateTransactionModal}
+        onClose={() => setOpenCreateTransactionModal(false)}
+        transactionCreateValues={transactionCreateValues}
+        onChange={(field) => (e) =>
+          setTransactionCreateValues((prevValues) => ({
+            ...prevValues,
+            [field]: e.target.value,
+          }))}
+        onValueChange={(values) => {
+          console.log(typeof values, 't', 'values', values);
+          setTransactionCreateValues((prevValues) => ({
+            ...prevValues,
+            value: values.floatValue ?? prevValues.value,
+          }));
+        }}
+        onClick={() => handleCreateTransaction(transactionCreateValues)}
+      />
       <Dialog
         open={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}
