@@ -9,18 +9,7 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid';
 import moment from 'moment';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  IconButton,
-  makeStyles,
-  SelectChangeEvent,
-} from '@mui/material';
+import { Button, Grid, IconButton, SelectChangeEvent } from '@mui/material';
 import { get, post, put, remove } from '../hooks/fetch';
 import useSWR, { mutate } from 'swr';
 import {
@@ -33,6 +22,7 @@ import DateFilter from '../components/DateFilterComponent';
 import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
 import ValueCard from '../components/ValueCardComponent';
+import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent';
 
 const HomePage: React.FC = () => {
   const initialTransactionCreateValues: CreateTransactionValues = {
@@ -322,23 +312,11 @@ const HomePage: React.FC = () => {
         }}
         onClick={() => handleCreateTransaction(transactionCreateValues)}
       />
-      <Dialog
+      <ConfirmDeleteModalComponent
         open={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this transaction?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
-          <Button onClick={confirmDeleteTransaction} color="secondary">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onClick={confirmDeleteTransaction}
+      />
     </article>
   );
 };
