@@ -18,6 +18,7 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  makeStyles,
   SelectChangeEvent,
 } from '@mui/material';
 import { get, post, put, remove } from '../hooks/fetch';
@@ -31,15 +32,9 @@ import { toast } from 'react-toastify';
 import DateFilter from '../components/DateFilterComponent';
 import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
-import FinalValueCard from '../components/TotalValueCardComponent';
+import ValueCard from '../components/ValueCardComponent';
 
 const HomePage: React.FC = () => {
-  const colorMap = {
-    Nubank: '#8306b4',
-    Xp: '#464444',
-    PicPay: '#14B457',
-  };
-
   const initialTransactionCreateValues: CreateTransactionValues = {
     description: '',
     type: TransactionType.Expense,
@@ -71,12 +66,16 @@ const HomePage: React.FC = () => {
   const [transactionCreateValues, setTransactionCreateValues] =
     useState<CreateTransactionValues>(initialTransactionCreateValues);
   const [chartData, setChartData] = useState([]);
-  const [sumByPaymentMethod, setSumByPaymentMethod] = useState({});
-  const [totalSum, setTotalSum] = useState(0);
+  const [sumExpenses, setSumExpenses] = useState(0);
+  const [sumIncome, setSumIncome] = useState(0);
 
   useEffect(() => {
     if (transactions) {
       const tagValues = transactions.reduce((acc, transaction) => {
+        if (transaction.type === 1) {
+          return acc;
+        }
+
         if (!acc[transaction.tag]) {
           acc[transaction.tag] = 0;
         }
@@ -89,21 +88,26 @@ const HomePage: React.FC = () => {
         value,
       }));
       setChartData(data);
-
-      const sumByPaymentMethod = transactions.reduce((acc, transaction) => {
-        if (!acc[transaction.paymentMethod]) {
-          acc[transaction.paymentMethod] = 0;
-        }
-        acc[transaction.paymentMethod] += transaction.value;
-        return acc;
-      }, {});
-
-      setSumByPaymentMethod(sumByPaymentMethod);
-      setTotalSum(
-        Object.values(sumByPaymentMethod).reduce((a, b) => a + b, 0) as number,
-      );
+      sumTotal(transactions);
     }
   }, [transactions]);
+
+  const sumTotal = (transactions) => {
+    const { sumExpenses, sumIncome } = transactions.reduce(
+      (sums, transaction) => {
+        if (transaction.type === 0) {
+          sums.sumExpenses += transaction.value;
+        } else if (transaction.type === 1) {
+          sums.sumIncome += transaction.value;
+        }
+        return sums;
+      },
+      { sumExpenses: 0, sumIncome: 0 },
+    );
+
+    setSumExpenses(sumExpenses);
+    setSumIncome(sumIncome);
+  };
 
   const handleCreateTransaction = async (
     formValues: CreateTransactionValues,
@@ -189,32 +193,32 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const getRowClassName = (params) => {
+    return params.row.type === 0 ? 'type0' : 'type1';
+  };
+
   const columns: GridColDef[] = [
     {
       field: 'description',
       headerName: 'Descrição',
-      width: 200,
       editable: true,
     },
     {
       field: 'startDate',
       headerName: 'Data',
-      width: 150,
       editable: true,
       type: 'date',
       valueFormatter: (params) => moment(params?.value).format('DD/MM/YYYY'),
     },
     {
       field: 'paymentMethod',
-      headerName: 'Método de pagamento',
-      width: 150,
+      headerName: 'Origem',
       editable: true,
     },
-    { field: 'tag', headerName: 'Tag', width: 150, editable: true },
+    { field: 'tag', headerName: 'Categoria', editable: true },
     {
       field: 'value',
       headerName: 'Valor',
-      width: 150,
       editable: true,
       valueFormatter: (params) =>
         parseFloat(params.value).toLocaleString('pt-BR', {
@@ -225,7 +229,6 @@ const HomePage: React.FC = () => {
     {
       field: 'actions',
       headerName: '',
-      width: 150,
       renderCell: (params) => (
         <IconButton
           style={{ color: '#945858' }}
@@ -242,26 +245,23 @@ const HomePage: React.FC = () => {
 
   // noinspection TypeScriptValidateTypes
   return (
-    <body
+    <article
       style={{
-        margin: '1vh',
-        padding: '5vh 5vh 3vh 5vh',
-        position: 'fixed',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
+        justifyContent: 'center',
+        marginTop: '5vh',
         display: 'grid',
       }}
     >
-      <section style={{ display: 'flex', justifyContent: 'space-around' }}>
-        <FinalValueCard
-          value={totalSum}
+      <section
+        style={{ display: 'flex', justifyContent: 'flex-end', gap: '2vh' }}
+      >
+        <ValueCard
+          value={sumExpenses}
           title="Despesas"
-          backgroundColor="#d33f3f"
+          backgroundColor="#965555"
         />
-        <FinalValueCard
-          value={24000}
+        <ValueCard
+          value={sumIncome}
           title="Receitas"
           backgroundColor="#537C53"
         />
@@ -269,37 +269,38 @@ const HomePage: React.FC = () => {
       <section
         style={{
           display: 'flex',
-          padding: '2vh',
           alignItems: 'center',
+          marginTop: '3vh',
         }}
       >
-        <section style={{ width: '50%' }}>
-          <Button
-            startIcon={<AddIcon />}
-            variant="outlined"
-            color="success"
-            onClick={() => setOpenCreateTransactionModal(true)}
-            style={{ marginBottom: '1vh' }}
-          >
-            Nova Transação
-          </Button>
+        <section style={{ width: '55%' }}>
+          <Grid display="flex" justifyContent="space-between">
+            <Button
+              startIcon={<AddIcon />}
+              variant="outlined"
+              color="success"
+              onClick={() => setOpenCreateTransactionModal(true)}
+              style={{ marginBottom: '1vh' }}
+            >
+              Nova Transação
+            </Button>
+            <DateFilter
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+              onChangeMonth={handleMonthFilterChange}
+              onChangeYear={handleYearFilterChange}
+            />
+          </Grid>
           <DataGrid
             rows={filteredTransactions ?? []}
             columns={columns}
-            pageSize={10}
             sx={{
               marginBottom: '1vh',
-              width: '100%',
-              height: 'auto',
-              maxWidth: '130vh',
+              overflow: 'none',
             }}
             onCellEditStop={handleEditCellChange}
-          />
-          <DateFilter
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onChangeMonth={handleMonthFilterChange}
-            onChangeYear={handleYearFilterChange}
+            getRowClassName={getRowClassName}
+            className="my-grid"
           />
         </section>
         <CustomChart data={chartData} />
@@ -338,7 +339,7 @@ const HomePage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </body>
+    </article>
   );
 };
 

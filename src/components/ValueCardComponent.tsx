@@ -6,7 +6,7 @@ interface FinalValueCardProps {
   title: string;
 }
 
-const FinalValueCard: React.FC<FinalValueCardProps> = ({
+const ValueCard: React.FC<FinalValueCardProps> = ({
   value,
   backgroundColor,
   title,
@@ -17,7 +17,7 @@ const FinalValueCard: React.FC<FinalValueCardProps> = ({
         border: '1px solid',
         background: backgroundColor || 'gray',
         borderRadius: '10px',
-        padding: '3vh 2vh 0vh 2vh',
+        padding: '1vh 2vh 1vh 2vh',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -33,4 +33,4 @@ const FinalValueCard: React.FC<FinalValueCardProps> = ({
   );
 };
 
-export default FinalValueCard;
+export default ValueCard;
