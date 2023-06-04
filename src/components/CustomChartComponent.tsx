@@ -37,7 +37,7 @@ const CustomChart = ({ data }) => {
   const defaultColor = '#808080';
 
   return (
-    <div style={{ width: '90vh', height: '70vh' }}>
+    <div style={{ width: '48%', height: '80%' }}>
       <ResponsiveBar
         data={data}
         colors={(bar) => colorMap[bar.indexValue] || defaultColor}

@@ -32,6 +32,12 @@ import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
 
 const HomePage: React.FC = () => {
+  const colorMap = {
+    Nubank: '#8306b4',
+    Xp: '#464444',
+    PicPay: '#14B457',
+  };
+
   const initialTransactionCreateValues: CreateTransactionValues = {
     description: '',
     type: TransactionType.Expense,
@@ -63,6 +69,8 @@ const HomePage: React.FC = () => {
   const [transactionCreateValues, setTransactionCreateValues] =
     useState<CreateTransactionValues>(initialTransactionCreateValues);
   const [chartData, setChartData] = useState([]);
+  const [sumByPaymentMethod, setSumByPaymentMethod] = useState({});
+  const [totalSum, setTotalSum] = useState(0);
 
   useEffect(() => {
     if (transactions) {
@@ -79,6 +87,19 @@ const HomePage: React.FC = () => {
         value,
       }));
       setChartData(data);
+
+      const sumByPaymentMethod = transactions.reduce((acc, transaction) => {
+        if (!acc[transaction.paymentMethod]) {
+          acc[transaction.paymentMethod] = 0;
+        }
+        acc[transaction.paymentMethod] += transaction.value;
+        return acc;
+      }, {});
+
+      setSumByPaymentMethod(sumByPaymentMethod);
+      setTotalSum(
+        Object.values(sumByPaymentMethod).reduce((a, b) => a + b, 0) as number,
+      );
     }
   }, [transactions]);
 
@@ -95,6 +116,7 @@ const HomePage: React.FC = () => {
       );
     } catch (error) {
       console.error('Error creating transaction:', error);
+      toast.success('Error creating transaction: ' + error);
     }
 
     setOpenCreateTransactionModal(false);
@@ -132,6 +154,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     if (error) {
+      toast.error(`Error fetching transactions: ${error}`);
       console.error('Error fetching transactions:', error);
     }
   }, [error]);
@@ -155,7 +178,9 @@ const HomePage: React.FC = () => {
     try {
       await put(`transaction`, row, vars.uri);
       toast.success('Transaction updated successfully');
-      await mutate('transactions/string');
+      await mutate(
+        `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
+      );
     } catch (error) {
       console.error('Error updating transaction:', error);
       toast.error('Error updating transaction');
@@ -169,7 +194,6 @@ const HomePage: React.FC = () => {
       width: 200,
       editable: true,
     },
-    { field: 'type', headerName: 'Type', width: 150, editable: true },
     {
       field: 'startDate',
       headerName: 'Data',
@@ -216,23 +240,93 @@ const HomePage: React.FC = () => {
 
   // noinspection TypeScriptValidateTypes
   return (
-    <div style={{ margin: '1vh' }}>
-      <Button
-        startIcon={<AddIcon />}
-        variant="outlined"
-        color="success"
-        onClick={() => setOpenCreateTransactionModal(true)}
-        style={{ marginBottom: '1vh', marginTop: '1vh' }}
+    <div
+      style={{
+        margin: '1vh',
+        padding: '3vh 5vh 3vh 5vh',
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        display: 'grid',
+      }}
+    >
+      <div style={{ display: 'flex', marginLeft: '1.5vh' }}>
+        <div id="expenses" style={{ width: '50%', display: 'flex' }}>
+          <div>
+            <div
+              style={{
+                border: '1px solid',
+                background: 'gray',
+                borderRadius: '10px',
+                padding: '1.5vh',
+                display: 'flex',
+                flexDirection: 'column',
+                marginRight: '1vh',
+              }}
+            >
+              <span>Despesas</span>
+              <span style={{ fontSize: '3vh' }}>
+                {totalSum.toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                })}
+              </span>
+            </div>
+          </div>
+          <div
+            style={{
+              alignItems: 'center',
+              display: 'grid',
+              gap: '1vh',
+            }}
+          >
+            {Object.entries(sumByPaymentMethod).map(([paymentMethod, sum]) => (
+              <div
+                key={paymentMethod}
+                style={{
+                  border: '1px solid',
+                  background: colorMap[paymentMethod] || 'gray',
+                  borderRadius: '10px',
+                  padding: '1.5vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <span>{paymentMethod} </span>
+                <span style={{ fontSize: '2vh' }}>
+                  {sum.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          padding: '2vh',
+          alignItems: 'center',
+        }}
       >
-        Nova Transação
-      </Button>
-      <div style={{ display: 'flex' }}>
-        <div>
+        <div style={{ width: '50%' }}>
+          <Button
+            startIcon={<AddIcon />}
+            variant="outlined"
+            color="success"
+            onClick={() => setOpenCreateTransactionModal(true)}
+            style={{ marginBottom: '1vh' }}
+          >
+            Nova Transação
+          </Button>
           <DataGrid
             rows={filteredTransactions ?? []}
             columns={columns}
             pageSize={10}
-            columnBuffer={1}
             sx={{
               marginBottom: '1vh',
               width: '100%',
@@ -260,7 +354,6 @@ const HomePage: React.FC = () => {
             [field]: e.target.value,
           }))}
         onValueChange={(values) => {
-          console.log(typeof values, 't', 'values', values);
           setTransactionCreateValues((prevValues) => ({
             ...prevValues,
             value: values.floatValue ?? prevValues.value,
