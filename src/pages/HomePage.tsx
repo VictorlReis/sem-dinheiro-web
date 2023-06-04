@@ -16,6 +16,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Grid,
   IconButton,
   SelectChangeEvent,
 } from '@mui/material';
@@ -30,6 +31,7 @@ import { toast } from 'react-toastify';
 import DateFilter from '../components/DateFilterComponent';
 import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
+import FinalValueCard from '../components/TotalValueCardComponent';
 
 const HomePage: React.FC = () => {
   const colorMap = {
@@ -240,10 +242,10 @@ const HomePage: React.FC = () => {
 
   // noinspection TypeScriptValidateTypes
   return (
-    <div
+    <body
       style={{
         margin: '1vh',
-        padding: '3vh 5vh 3vh 5vh',
+        padding: '5vh 5vh 3vh 5vh',
         position: 'fixed',
         top: 0,
         bottom: 0,
@@ -252,68 +254,26 @@ const HomePage: React.FC = () => {
         display: 'grid',
       }}
     >
-      <div style={{ display: 'flex', marginLeft: '1.5vh' }}>
-        <div id="expenses" style={{ width: '50%', display: 'flex' }}>
-          <div>
-            <div
-              style={{
-                border: '1px solid',
-                background: 'gray',
-                borderRadius: '10px',
-                padding: '1.5vh',
-                display: 'flex',
-                flexDirection: 'column',
-                marginRight: '1vh',
-              }}
-            >
-              <span>Despesas</span>
-              <span style={{ fontSize: '3vh' }}>
-                {totalSum.toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                })}
-              </span>
-            </div>
-          </div>
-          <div
-            style={{
-              alignItems: 'center',
-              display: 'grid',
-              gap: '1vh',
-            }}
-          >
-            {Object.entries(sumByPaymentMethod).map(([paymentMethod, sum]) => (
-              <div
-                key={paymentMethod}
-                style={{
-                  border: '1px solid',
-                  background: colorMap[paymentMethod] || 'gray',
-                  borderRadius: '10px',
-                  padding: '1.5vh',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <span>{paymentMethod} </span>
-                <span style={{ fontSize: '2vh' }}>
-                  {sum.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL',
-                  })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div
+      <section style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <FinalValueCard
+          value={totalSum}
+          title="Despesas"
+          backgroundColor="#d33f3f"
+        />
+        <FinalValueCard
+          value={24000}
+          title="Receitas"
+          backgroundColor="#537C53"
+        />
+      </section>
+      <section
         style={{
           display: 'flex',
           padding: '2vh',
           alignItems: 'center',
         }}
       >
-        <div style={{ width: '50%' }}>
+        <section style={{ width: '50%' }}>
           <Button
             startIcon={<AddIcon />}
             variant="outlined"
@@ -341,9 +301,9 @@ const HomePage: React.FC = () => {
             onChangeMonth={handleMonthFilterChange}
             onChangeYear={handleYearFilterChange}
           />
-        </div>
+        </section>
         <CustomChart data={chartData} />
-      </div>
+      </section>
       <CreateTransactionModal
         open={openCreateTransactionModal}
         onClose={() => setOpenCreateTransactionModal(false)}
@@ -378,7 +338,7 @@ const HomePage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </body>
   );
 };
 
