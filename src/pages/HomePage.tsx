@@ -69,7 +69,11 @@ const HomePage: React.FC = () => {
         if (!acc[transaction.tag]) {
           acc[transaction.tag] = 0;
         }
-        acc[transaction.tag] += transaction.value;
+
+        // Round the value to 2 decimal places before adding it
+        const valueToAdd =
+          Math.round((transaction.value + Number.EPSILON) * 100) / 100;
+        acc[transaction.tag] += valueToAdd;
         return acc;
       }, {});
 
@@ -192,6 +196,7 @@ const HomePage: React.FC = () => {
       field: 'description',
       headerName: 'Descrição',
       editable: true,
+      width: 200,
     },
     {
       field: 'startDate',
@@ -259,7 +264,6 @@ const HomePage: React.FC = () => {
       <section
         style={{
           display: 'flex',
-          alignItems: 'center',
           marginTop: '3vh',
         }}
       >
@@ -290,7 +294,7 @@ const HomePage: React.FC = () => {
             }}
             onCellEditStop={handleEditCellChange}
             getRowClassName={getRowClassName}
-            className="my-grid"
+            className="transaction-grid"
           />
         </section>
         <CustomChart data={chartData} />

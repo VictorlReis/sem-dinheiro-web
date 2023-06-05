@@ -1,54 +1,56 @@
 // noinspection TypeScriptValidateTypes
 
 import React from 'react';
-import { ResponsiveBar } from '@nivo/bar';
+import { ResponsivePie } from '@nivo/pie';
 
 const CustomChart = ({ data }) => {
   const theme = {
     labels: {
-      text: '#ffffff',
+      text: {
+        fill: '#fff',
+      },
     },
     tooltip: {
       container: {
         background: '#333333',
       },
     },
-    axis: {
-      ticks: {
-        text: {
-          fill: '#ffffff',
-        },
-      },
-      legend: {
-        text: {
-          fill: '#ffffff',
-        },
-      },
-    },
   };
 
   const colorMap = {
-    ifood: '#d20707',
-    casa: 'rgb(84,56,56)',
-    academia: '#d7ba29',
-    educacao: '#6f6fb2',
+    contas: '#3232d7',
+    ifood: '#ff0000',
+    casa: '#4e9a1c',
+    academia: '#FFBE0F',
+    educacao: '#d6a735',
+    saude: '#fff',
+    mercado: '#af9b61',
+    padaria: '#ffa222',
+    role: '#E0CCF1',
+    uber: '#000000',
+    carro: '#595e5e',
+    bike: '#2a2727',
+    vestuario: '#6c3b88',
+    faxina: '#e5b8b8',
+    terapia: '#69e5c5',
+    marmita: '#2c591f',
   };
 
-  const defaultColor = '#808080';
+  const defaultColor = '#B3BDC3';
 
   return (
-    <div style={{ width: '48%', height: '80%' }}>
-      <ResponsiveBar
-        data={data}
-        colors={(bar) => colorMap[bar.indexValue] || defaultColor}
+    <div style={{ width: '48rem', height: '50rem' }}>
+      <ResponsivePie
+        data={data.map((item) => ({
+          id: item.tag,
+          value: parseFloat(item.value.toFixed(2)),
+        }))}
+        colors={({ id }) => colorMap[id] || defaultColor}
         theme={theme}
-        indexBy="tag"
-        margin={{ top: 10, right: 10, bottom: 20, left: 50 }}
-        padding={0.1}
-        borderColor={{ from: 'color', modifiers: [['brighter', 1.6]] }}
-        labelSkipWidth={10}
-        labelSkipHeight={10}
-        labelTextColor={{ from: 'color', modifiers: [['brighter', 1.6]] }}
+        margin={{ top: 10, right: 70, bottom: 20, left: 100 }}
+        innerRadius={0.5}
+        padAngle={0.7}
+        cornerRadius={3}
       />
     </div>
   );
