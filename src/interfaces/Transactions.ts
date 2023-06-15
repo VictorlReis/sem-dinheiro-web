@@ -1,22 +1,22 @@
 export interface Transaction {
-  id: number;
+  id: string;
   description: string;
   type: number;
-  startDate: Date;
-  paymentMethod: string;
+  start_date: Date;
+  payment_method: string;
   tag: string;
   value: number;
-  userId: string;
+  user_id: string;
 }
 
 export interface CreateTransactionValues {
   description: string;
   type: TransactionType;
-  startDate: string;
-  paymentMethod: string;
+  start_date: string;
+  payment_method: string;
   tag: string;
   value: number;
-  userId: string;
+  user_id: string;
 }
 
 export enum TransactionType {

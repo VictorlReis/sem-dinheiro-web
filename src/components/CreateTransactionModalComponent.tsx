@@ -41,16 +41,16 @@ const CreateTransactionModal: React.FC<Props> = (props) => {
           />
           <Input
             type="date"
-            value={props.transactionCreateValues.startDate}
-            onChange={props.onChange('startDate')}
+            value={props.transactionCreateValues.start_date}
+            onChange={props.onChange('start_date')}
             sx={{ marginTop: '2vh' }}
             placeholder="Start Date"
           />
           <Input
             label="Payment Method"
             type="text"
-            value={props.transactionCreateValues.paymentMethod}
-            onChange={props.onChange('paymentMethod')}
+            value={props.transactionCreateValues.payment_method}
+            onChange={props.onChange('payment_method')}
             sx={{ marginTop: '2vh' }}
             placeholder="Payment Method"
           />

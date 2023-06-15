@@ -4,7 +4,7 @@ interface ConfigVars {
 
 const vars: ConfigVars = {
   local: {
-    uri: 'http://localhost:5076/',
+    uri: 'http://localhost:8000/',
   },
 };
 
