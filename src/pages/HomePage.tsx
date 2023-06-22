@@ -28,11 +28,11 @@ const HomePage: React.FC = () => {
   const initialTransactionCreateValues: CreateTransactionValues = {
     description: '',
     type: TransactionType.Expense,
-    start_date: moment().format('YYYY-MM-DD'),
-    payment_method: '',
+    startDate: moment().format('YYYY-MM-DD'),
+    paymentMethod: '',
     tag: '',
     value: 0,
-    user_id: '',
+    userId: '',
   };
 
   const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
   const [openCreateTransactionModal, setOpenCreateTransactionModal] =
     useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [transactionIdToDelete, setTransactionIdToDelete] = useState('');
+  const [transactionIdToDelete, setTransactionIdToDelete] = useState(0);
   const [filteredTransactions, setFilteredTransactions] = useState<
     GridRowsProp<Transaction> | undefined
   >(transactions);
@@ -106,8 +106,8 @@ const HomePage: React.FC = () => {
     formValues: CreateTransactionValues,
   ) => {
     try {
-      console.log(formValues, 'formvalues');
       await post('transaction', { ...formValues, user_id: 'string' }, vars.uri);
+      await post('transaction', { ...formValues, userId: 'string' }, vars.uri);
 
       toast.success('Transaction created successfully');
       setTransactionCreateValues(initialTransactionCreateValues);
@@ -134,7 +134,7 @@ const HomePage: React.FC = () => {
       toast.error('Error deleting transaction');
     } finally {
       setConfirmDialogOpen(false);
-      setTransactionIdToDelete('');
+      setTransactionIdToDelete(0);
     }
   };
 
@@ -145,7 +145,7 @@ const HomePage: React.FC = () => {
       } else {
         const filteredData = transactions.filter(
           (transaction) =>
-            moment(transaction.start_date).month() + 1 === selectedMonth,
+            moment(transaction.startDate).month() + 1 === selectedMonth,
         );
         setFilteredTransactions(filteredData);
       }
@@ -220,14 +220,14 @@ const HomePage: React.FC = () => {
       width: 200,
     },
     {
-      field: 'start_date',
+      field: 'startDate',
       headerName: 'Data',
       editable: true,
       type: 'date',
       valueFormatter: (params) => moment(params?.value).format('DD/MM/YYYY'),
     },
     {
-      field: 'payment_method',
+      field: 'paymentMethod',
       headerName: 'Origem',
       editable: true,
     },
