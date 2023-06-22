@@ -10,7 +10,7 @@ import {
 } from '@mui/x-data-grid';
 import moment from 'moment';
 import { Button, Grid, IconButton, SelectChangeEvent } from '@mui/material';
-import { get, post, put, remove } from '../hooks/fetch';
+import { get, post, postFile, put, remove } from '../hooks/fetch';
 import useSWR, { mutate } from 'swr';
 import {
   CreateTransactionValues,
@@ -70,7 +70,6 @@ const HomePage: React.FC = () => {
           acc[transaction.tag] = 0;
         }
 
-        // Round the value to 2 decimal places before adding it
         const valueToAdd =
           Math.round((transaction.value + Number.EPSILON) * 100) / 100;
         acc[transaction.tag] += valueToAdd;
@@ -107,7 +106,7 @@ const HomePage: React.FC = () => {
     formValues: CreateTransactionValues,
   ) => {
     try {
-      console.log(formValues);
+      console.log(formValues, 'formvalues');
       await post('transaction', { ...formValues, user_id: 'string' }, vars.uri);
 
       toast.success('Transaction created successfully');
@@ -175,6 +174,9 @@ const HomePage: React.FC = () => {
     event: any,
   ) => {
     const { field, row } = params;
+
+    row.start_date = moment(row.start_date).format('YYYY-MM-DD');
+
     row[field] = (event as { target: { value: unknown } }).target.value;
     try {
       await put(`transaction`, row, vars.uri);
@@ -185,6 +187,24 @@ const HomePage: React.FC = () => {
     } catch (error) {
       console.error('Error updating transaction:', error);
       toast.error('Error updating transaction');
+    }
+  };
+
+  const onClickCsvButton = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+
+        await postFile('transactions/csv', formData);
+
+        toast.success('CSV file uploaded successfully');
+      } catch (error) {
+        toast.error('Error uploading CSV file:', error);
+      }
     }
   };
 
@@ -278,6 +298,21 @@ const HomePage: React.FC = () => {
               style={{ marginBottom: '1vh' }}
             >
               Nova Transação
+            </Button>
+            <Button
+              component="label"
+              variant="outlined"
+              color="success"
+              style={{ marginBottom: '1vh' }}
+            >
+              {/*<CloudUploadIcon style={{ marginRight: '8px' }} />*/}
+              Importar CSV
+              <input
+                type="file"
+                accept=".csv"
+                style={{ display: 'none' }}
+                onChange={(e) => onClickCsvButton(e)}
+              />
             </Button>
             <DateFilter
               selectedMonth={selectedMonth}

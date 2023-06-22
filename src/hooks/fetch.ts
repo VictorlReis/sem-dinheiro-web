@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import vars from '../config/config';
+import axios from 'axios';
 //import { Auth } from 'aws-amplify';
 
 // async function addBearerToken(
@@ -56,6 +57,18 @@ export async function get<T>(
 ): Promise<T> {
   const init = { method: 'get', ...config };
   return await http<T>(path, init, base);
+}
+
+export async function postFile<T, U>(
+  path: string,
+  body: T,
+  base: string = vars.uri,
+): Promise<U> {
+  await axios.post(`${base}${path}`, body, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 }
 
 export async function post<T, U>(
