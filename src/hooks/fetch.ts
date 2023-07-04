@@ -1,27 +1,6 @@
 import useSWR from 'swr';
 import vars from '../config/config';
 import axios from 'axios';
-//import { Auth } from 'aws-amplify';
-
-// async function addBearerToken(
-//   path: string,
-//   config: RequestInit,
-// ): Promise<RequestInit> {
-//   try {
-//     const session = await Auth.currentSession();
-//     const token = session.getIdToken().getJwtToken();
-//     const id = (localStorage.getItem('user') || '').replaceAll('"', '');
-//     config.headers = {
-//       ...(config.headers as Record<string, string>),
-//       Authorization: `Bearer ${token}`,
-//       id,
-//     };
-//     return config;
-//   } catch (error) {
-//     console.error('Error adding bearer token:', error);
-//     return config;
-//   }
-// }
 
 async function http<T>(
   path: string,
@@ -77,16 +56,12 @@ export async function post<T, U>(
   base: string = vars.uri,
   config?: RequestInit,
 ): Promise<U> {
-  console.log(' body, ', body);
-  console.log(' path, ', path);
   const init = {
     method: 'post',
     body: JSON.stringify(body),
     headers: { 'content-type': 'application/json' },
     ...config,
   };
-  console.log(' init, ', init);
-  console.log(' init, ', base);
   return await http<U>(path, init, base);
 }
 export async function put<T, U>(

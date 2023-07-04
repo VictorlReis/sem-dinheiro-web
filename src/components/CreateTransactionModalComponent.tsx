@@ -17,66 +17,80 @@ import {
   Select,
 } from '@mui/material';
 import CurrencyTextField from './CurrencyTextField';
+import { Controller, useForm } from 'react-hook-form';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  transactionCreateValues: CreateTransactionValues;
-  onChange: (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   onValueChange: (values: any) => void;
   onClick: () => Promise<void>;
+  handleCreateTransaction: () => Promise<void>;
 }
 
 const CreateTransactionModal: React.FC<Props> = (props) => {
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateTransactionValues>();
+
+  const onSubmit = async (data) => {
+    console.log(data);
+    await props.handleCreateTransaction(data);
+  };
+
   return (
     <Dialog open={props.open} onClose={props.onClose} display="flex">
       <DialogTitle>Create Transaction</DialogTitle>
       <DialogContent>
         <Box display="grid" gridgap="10vh">
-          <Input
-            type="text"
-            value={props.transactionCreateValues.description}
-            onChange={props.onChange('description')}
-            placeholder="Description"
-          />
-          <Input
-            type="date"
-            value={props.transactionCreateValues.startDate}
-            onChange={props.onChange('startDate')}
-            sx={{ marginTop: '2vh' }}
-            placeholder="Start Date"
-          />
-          <Input
-            label="Payment Method"
-            type="text"
-            value={props.transactionCreateValues.paymentMethod}
-            onChange={props.onChange('paymentMethod')}
-            sx={{ marginTop: '2vh' }}
-            placeholder="Payment Method"
-          />
-          <Input
-            type="text"
-            value={props.transactionCreateValues.tag}
-            onChange={props.onChange('tag')}
-            sx={{ marginTop: '2vh' }}
-            placeholder="Tag"
-          />
-          <CurrencyTextField
-            id="value"
-            placeholder="Value"
-            variant="outlined"
-            value={props.transactionCreateValues.value}
-            onValueChange={props.onValueChange}
-          />
-          <Select
-            sx={{ marginTop: '2vh', height: '4vh' }}
-            onChange={props.onChange('type')}
-            value={props.transactionCreateValues.type}
-            placeholder="Type"
-          >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Input
+              type="text"
+              {...register('description')}
+              placeholder="Description"
+            />
+            <Input
+              type="date"
+              {...register('startDate')}
+              sx={{ marginTop: '2vh' }}
+              placeholder="Start Date"
+            />
+            <Input
+              label="Payment Method"
+              type="text"
+              {...register('paymentMethod')}
+              sx={{ marginTop: '2vh' }}
+              placeholder="Payment Method"
+            />
+            <Input
+              type="text"
+              {...register('tag')}
+              sx={{ marginTop: '2vh' }}
+              placeholder="Tag"
+            />
+            <CurrencyTextField
+              id="value"
+              placeholder="Value"
+              {...register('value')}
+              variant="outlined"
+              onValueChange={props.onValueChange}
+            />
+            <Controller
+              name="type"
+              control={control}
+              defaultValue={TransactionType.Expense}
+              render={({ field }) => (
+                <Select {...field} placeholder="Type">
+                  <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
+                  <MenuItem value={TransactionType.Income}>Income</MenuItem>
+                </Select>
+              )}
+            />
             <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
             <MenuItem value={TransactionType.Income}>Income</MenuItem>
-          </Select>
+          </form>
         </Box>
       </DialogContent>
       <DialogActions>

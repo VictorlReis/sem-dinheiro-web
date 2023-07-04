@@ -23,18 +23,9 @@ import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
 import ValueCard from '../components/ValueCardComponent';
 import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent';
+import { useForm } from 'react-hook-form';
 
 const HomePage: React.FC = () => {
-  const initialTransactionCreateValues: CreateTransactionValues = {
-    description: '',
-    type: TransactionType.Expense,
-    startDate: moment().format('YYYY-MM-DD'),
-    paymentMethod: '',
-    tag: '',
-    value: 0,
-    userId: '',
-  };
-
   const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
   const [selectedYear, setSelectedYear] = useState(moment().year());
   const [userId, setUserId] = useState('string');
@@ -201,6 +192,8 @@ const HomePage: React.FC = () => {
 
         await postFile('transactions/csv', formData);
 
+        console.log('teste');
+
         toast.success('CSV file uploaded successfully');
       } catch (error) {
         toast.error('Error uploading CSV file:', error);
@@ -247,7 +240,7 @@ const HomePage: React.FC = () => {
       headerName: '',
       renderCell: (params) => (
         <IconButton
-          style={{ color: '#945858' }}
+          style={{ color: '#bb3a32' }}
           onClick={() => {
             setConfirmDialogOpen(true);
             setTransactionIdToDelete(params.row.id);
@@ -274,12 +267,17 @@ const HomePage: React.FC = () => {
         <ValueCard
           value={sumExpenses}
           title="Despesas"
-          backgroundColor="#965555"
+          backgroundColor="#bb3a32"
         />
         <ValueCard
           value={sumIncome}
           title="Receitas"
-          backgroundColor="#537C53"
+          backgroundColor="#437e33"
+        />
+        <ValueCard
+          value={sumIncome - sumExpenses}
+          title="Total Final"
+          backgroundColor="#7f7f7f"
         />
       </section>
       <section
@@ -305,7 +303,6 @@ const HomePage: React.FC = () => {
               color="success"
               style={{ marginBottom: '1vh' }}
             >
-              {/*<CloudUploadIcon style={{ marginRight: '8px' }} />*/}
               Importar CSV
               <input
                 type="file"
@@ -338,19 +335,8 @@ const HomePage: React.FC = () => {
       <CreateTransactionModal
         open={openCreateTransactionModal}
         onClose={() => setOpenCreateTransactionModal(false)}
-        transactionCreateValues={transactionCreateValues}
-        onChange={(field) => (e) =>
-          setTransactionCreateValues((prevValues) => ({
-            ...prevValues,
-            [field]: e.target.value,
-          }))}
-        onValueChange={(values) => {
-          setTransactionCreateValues((prevValues) => ({
-            ...prevValues,
-            value: values.floatValue ?? prevValues.value,
-          }));
-        }}
         onClick={() => handleCreateTransaction(transactionCreateValues)}
+        handleCreateTransaction={handleCreateTransaction}
       />
       <ConfirmDeleteModalComponent
         open={confirmDialogOpen}
