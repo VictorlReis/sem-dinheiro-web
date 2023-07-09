@@ -18,34 +18,42 @@ import {
 } from '@mui/material';
 import CurrencyTextField from './CurrencyTextField';
 import { Controller, useForm } from 'react-hook-form';
+import moment from 'moment';
 
-interface Props {
+interface CreateTransactionModalProps {
   open: boolean;
   onClose: () => void;
-  onValueChange: (values: any) => void;
-  onClick: () => Promise<void>;
   handleCreateTransaction: () => Promise<void>;
 }
 
-const CreateTransactionModal: React.FC<Props> = (props) => {
+const CreateTransactionModal: React.FC<CreateTransactionModalProps> = (
+  props,
+) => {
   const {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<CreateTransactionValues>();
+  } = useForm<CreateTransactionValues>({
+    defaultValues: {
+      amount: 0,
+      type: TransactionType.Expense,
+      startDate: moment().format('YYYY-MM-DD'),
+    },
+  });
 
   const onSubmit = async (data) => {
-    console.log(data);
     await props.handleCreateTransaction(data);
+    reset();
   };
 
   return (
     <Dialog open={props.open} onClose={props.onClose} display="flex">
-      <DialogTitle>Create Transaction</DialogTitle>
-      <DialogContent>
-        <Box display="grid" gridgap="10vh">
-          <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogTitle>Create Transaction</DialogTitle>
+        <DialogContent>
+          <Box display="grid" gridgap="10vh">
             <Input
               type="text"
               {...register('description')}
@@ -70,37 +78,39 @@ const CreateTransactionModal: React.FC<Props> = (props) => {
               sx={{ marginTop: '2vh' }}
               placeholder="Tag"
             />
-            <CurrencyTextField
-              id="value"
-              placeholder="Value"
-              {...register('value')}
-              variant="outlined"
-              onValueChange={props.onValueChange}
+            <Controller
+              sx={{ marginTop: '2vh' }}
+              name="amount"
+              control={control}
+              render={({ field }) => (
+                <CurrencyTextField
+                  id="amount"
+                  placeholder="Enter amount"
+                  onValueChange={(values) => field.onChange(values.value)}
+                />
+              )}
             />
             <Controller
               name="type"
               control={control}
-              defaultValue={TransactionType.Expense}
               render={({ field }) => (
-                <Select {...field} placeholder="Type">
+                <Select {...field} placeholder="Type" sx={{ marginTop: '2vh' }}>
                   <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
                   <MenuItem value={TransactionType.Income}>Income</MenuItem>
                 </Select>
               )}
             />
-            <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
-            <MenuItem value={TransactionType.Income}>Income</MenuItem>
-          </form>
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button color="error" onClick={props.onClose}>
-          Cancel
-        </Button>
-        <Button color="success" onClick={props.onClick}>
-          Create
-        </Button>
-      </DialogActions>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button color="error" onClick={props.onClose}>
+            Cancel
+          </Button>
+          <Button color="success" type="submit" onClick={handleSubmit}>
+            Create
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };

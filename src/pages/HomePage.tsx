@@ -15,7 +15,6 @@ import useSWR, { mutate } from 'swr';
 import {
   CreateTransactionValues,
   Transaction,
-  TransactionType,
 } from '../interfaces/Transactions';
 import { toast } from 'react-toastify';
 import DateFilter from '../components/DateFilterComponent';
@@ -23,7 +22,6 @@ import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
 import ValueCard from '../components/ValueCardComponent';
 import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent';
-import { useForm } from 'react-hook-form';
 
 const HomePage: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
@@ -44,8 +42,6 @@ const HomePage: React.FC = () => {
   const [filteredTransactions, setFilteredTransactions] = useState<
     GridRowsProp<Transaction> | undefined
   >(transactions);
-  const [transactionCreateValues, setTransactionCreateValues] =
-    useState<CreateTransactionValues>(initialTransactionCreateValues);
   const [chartData, setChartData] = useState([]);
   const [sumExpenses, setSumExpenses] = useState(0);
   const [sumIncome, setSumIncome] = useState(0);
@@ -97,11 +93,9 @@ const HomePage: React.FC = () => {
     formValues: CreateTransactionValues,
   ) => {
     try {
-      await post('transaction', { ...formValues, user_id: 'string' }, vars.uri);
       await post('transaction', { ...formValues, userId: 'string' }, vars.uri);
 
       toast.success('Transaction created successfully');
-      setTransactionCreateValues(initialTransactionCreateValues);
       await mutate(
         `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
       );
@@ -146,7 +140,6 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (error) {
       toast.error(`Error fetching transactions: ${error}`);
-      console.error('Error fetching transactions:', error);
     }
   }, [error]);
 
@@ -191,8 +184,6 @@ const HomePage: React.FC = () => {
         formData.append('file', file, file.name);
 
         await postFile('transactions/csv', formData);
-
-        console.log('teste');
 
         toast.success('CSV file uploaded successfully');
       } catch (error) {
@@ -335,7 +326,6 @@ const HomePage: React.FC = () => {
       <CreateTransactionModal
         open={openCreateTransactionModal}
         onClose={() => setOpenCreateTransactionModal(false)}
-        onClick={() => handleCreateTransaction(transactionCreateValues)}
         handleCreateTransaction={handleCreateTransaction}
       />
       <ConfirmDeleteModalComponent

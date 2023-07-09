@@ -17,7 +17,6 @@ const NumberFormatCustom = forwardRef<HTMLInputElement, IProps>(
         {...other}
         getInputRef={inputRef}
         onValueChange={onValueChange}
-        //isnumericstring
         prefix="R$"
         decimalScale={2}
         fixedDecimalScale
