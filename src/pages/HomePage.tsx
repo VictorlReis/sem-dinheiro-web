@@ -32,7 +32,7 @@ type ChartData = {
 const HomePage: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
   const [selectedYear, setSelectedYear] = useState(moment().year());
-  const [userId, setUserId] = useState('string');
+  const [userId] = useState('string');
 
   const { data: transactions, error } = useSWR<GridRowsProp<Transaction>>(
     `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
