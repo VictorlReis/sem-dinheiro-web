@@ -6,26 +6,25 @@ interface IProps extends ComponentProps<typeof NumericFormat> {
   id: string;
   placeholder: string;
   onValueChange?: (values: NumberFormatValues) => void;
+  inputRef?: React.Ref<any>;
 }
 
-const NumberFormatCustom = forwardRef<HTMLInputElement, IProps>(
-  (props, ref) => {
-    const { inputRef, onValueChange: onValueChange, ...other } = props;
+const NumberFormatCustom = forwardRef<HTMLInputElement, IProps>((props) => {
+  const { inputRef, onValueChange: onValueChange, ...other } = props;
 
-    return (
-      <NumericFormat
-        {...other}
-        getInputRef={inputRef}
-        onValueChange={onValueChange}
-        prefix="R$"
-        decimalScale={2}
-        fixedDecimalScale
-        thousandSeparator="."
-        decimalSeparator=","
-      />
-    );
-  },
-);
+  return (
+    <NumericFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={onValueChange}
+      prefix="R$"
+      decimalScale={2}
+      fixedDecimalScale
+      thousandSeparator="."
+      decimalSeparator=","
+    />
+  );
+});
 
 const CurrencyTextField: React.FC<IProps> = ({
   id,
