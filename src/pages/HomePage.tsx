@@ -8,6 +8,7 @@ import {
   GridDeleteIcon,
   GridRowParams,
   GridRowsProp,
+  MuiEvent,
 } from '@mui/x-data-grid';
 import moment from 'moment';
 import { Button, Grid, IconButton, SelectChangeEvent } from '@mui/material';
@@ -162,7 +163,7 @@ const HomePage: React.FC = () => {
 
   const handleEditCellChange = async (
     params: GridCellEditStopParams,
-    event: any,
+    event: MuiEvent,
   ) => {
     const { field, row } = params;
 
@@ -189,7 +190,6 @@ const HomePage: React.FC = () => {
       try {
         const formData = new FormData();
         formData.append('file', file, file.name);
-
         await postFile('transactions/csv', formData);
 
         toast.success('CSV file uploaded successfully');
