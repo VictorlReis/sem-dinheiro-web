@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import vars from '../config/config';
-import AddIcon from '@mui/icons-material/Add';
+import React, { useEffect, useState } from 'react'
+import vars from '../config/config'
+import AddIcon from '@mui/icons-material/Add'
 import {
   DataGrid,
   GridCellEditStopParams,
@@ -9,199 +9,199 @@ import {
   GridRowParams,
   GridRowsProp,
   MuiEvent,
-} from '@mui/x-data-grid';
-import moment from 'moment';
-import { Button, Grid, IconButton, SelectChangeEvent } from '@mui/material';
-import { get, post, postFile, put, remove } from '../hooks/fetch';
-import useSWR, { mutate } from 'swr';
+} from '@mui/x-data-grid'
+import moment from 'moment'
+import { Button, Grid, IconButton, SelectChangeEvent } from '@mui/material'
+import { get, post, postFile, put, remove } from '../hooks/fetch'
+import useSWR, { mutate } from 'swr'
 import {
   CreateTransactionValues,
   Transaction,
-} from '../interfaces/Transactions';
-import { toast } from 'react-toastify';
-import DateFilter from '../components/DateFilterComponent';
-import CustomChart from '../components/CustomChartComponent';
-import CreateTransactionModal from '../components/CreateTransactionModalComponent';
-import ValueCard from '../components/ValueCardComponent';
-import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent';
+} from '../interfaces/Transactions'
+import { toast } from 'react-toastify'
+import DateFilter from '../components/DateFilterComponent'
+import CustomChart from '../components/CustomChartComponent'
+import CreateTransactionModal from '../components/CreateTransactionModalComponent'
+import ValueCard from '../components/ValueCardComponent'
+import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent'
 
 type ChartData = {
-  tag: string;
-  value: number;
-};
+  tag: string
+  value: number
+}
 
 const HomePage: React.FC = () => {
-  const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
-  const [selectedYear, setSelectedYear] = useState(moment().year());
-  const [userId] = useState('string');
+  const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1)
+  const [selectedYear, setSelectedYear] = useState(moment().year())
+  const [userId] = useState('string')
 
   const { data: transactions, error } = useSWR<GridRowsProp<Transaction>>(
     `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
     async (url) => {
-      return await get(url, vars.uri);
+      return await get(url, vars.uri)
     },
-  );
+  )
 
   const [openCreateTransactionModal, setOpenCreateTransactionModal] =
-    useState(false);
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [transactionIdToDelete, setTransactionIdToDelete] = useState(0);
+    useState(false)
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [transactionIdToDelete, setTransactionIdToDelete] = useState(0)
   const [filteredTransactions, setFilteredTransactions] = useState<
     GridRowsProp<Transaction> | undefined
-  >(transactions);
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [sumExpenses, setSumExpenses] = useState(0);
-  const [sumIncome, setSumIncome] = useState(0);
+  >(transactions)
+  const [chartData, setChartData] = useState<ChartData[]>([])
+  const [sumExpenses, setSumExpenses] = useState(0)
+  const [sumIncome, setSumIncome] = useState(0)
 
   useEffect(() => {
     if (transactions) {
       const tagValues = transactions.reduce(
         (acc: { [tag: string]: number }, transaction) => {
           if (transaction.type === 1) {
-            return acc;
+            return acc
           }
 
           if (!acc[transaction.tag]) {
-            acc[transaction.tag] = 0;
+            acc[transaction.tag] = 0
           }
 
           const valueToAdd =
-            Math.round((transaction.value + Number.EPSILON) * 100) / 100;
-          acc[transaction.tag] += valueToAdd;
-          return acc;
+            Math.round((transaction.value + Number.EPSILON) * 100) / 100
+          acc[transaction.tag] += valueToAdd
+          return acc
         },
         {},
-      );
+      )
 
       const data = Object.entries(tagValues).map(([tag, value]) => ({
         tag,
         value,
-      }));
-      setChartData(data);
-      sumTotal(transactions);
+      }))
+      setChartData(data)
+      sumTotal(transactions)
     }
-  }, [transactions]);
+  }, [transactions])
 
   const sumTotal = (transactions: readonly Transaction[]) => {
     const { sumExpenses, sumIncome } = transactions.reduce(
       (sums, transaction) => {
         if (transaction.type === 0) {
-          sums.sumExpenses += transaction.value;
+          sums.sumExpenses += transaction.value
         } else if (transaction.type === 1) {
-          sums.sumIncome += transaction.value;
+          sums.sumIncome += transaction.value
         }
-        return sums;
+        return sums
       },
       { sumExpenses: 0, sumIncome: 0 },
-    );
+    )
 
-    setSumExpenses(sumExpenses);
-    setSumIncome(sumIncome);
-  };
+    setSumExpenses(sumExpenses)
+    setSumIncome(sumIncome)
+  }
 
   const handleCreateTransaction = async (
     formValues: CreateTransactionValues,
   ) => {
     try {
-      await post('transaction', { ...formValues, userId: 'string' }, vars.uri);
+      await post('transaction', { ...formValues, userId: 'string' }, vars.uri)
 
-      toast.success('Transaction created successfully');
+      toast.success('Transaction created successfully')
       await mutate(
         `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
-      );
+      )
     } catch (error) {
-      console.error('Error creating transaction:', error);
-      toast.success('Error creating transaction: ' + error);
+      console.error('Error creating transaction:', error)
+      toast.success('Error creating transaction: ' + error)
     }
 
-    setOpenCreateTransactionModal(false);
-  };
+    setOpenCreateTransactionModal(false)
+  }
 
   const confirmDeleteTransaction = async () => {
     try {
-      await remove(`transaction/${transactionIdToDelete}`, vars.uri);
-      toast.success('Transaction deleted successfully');
+      await remove(`transaction/${transactionIdToDelete}`, vars.uri)
+      toast.success('Transaction deleted successfully')
       await mutate(
         `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
-      );
+      )
     } catch (error) {
-      console.error('Error deleting transaction:', error);
-      toast.error('Error deleting transaction');
+      console.error('Error deleting transaction:', error)
+      toast.error('Error deleting transaction')
     } finally {
-      setConfirmDialogOpen(false);
-      setTransactionIdToDelete(0);
+      setConfirmDialogOpen(false)
+      setTransactionIdToDelete(0)
     }
-  };
+  }
 
   useEffect(() => {
     if (transactions) {
       if (selectedMonth === 0) {
-        setFilteredTransactions(transactions);
+        setFilteredTransactions(transactions)
       } else {
         const filteredData = transactions.filter(
           (transaction) =>
             moment(transaction.startDate).month() + 1 === selectedMonth,
-        );
-        setFilteredTransactions(filteredData);
+        )
+        setFilteredTransactions(filteredData)
       }
     }
-  }, [transactions, selectedMonth]);
+  }, [transactions, selectedMonth])
 
   useEffect(() => {
     if (error) {
-      toast.error(`Error fetching transactions: ${error}`);
+      toast.error(`Error fetching transactions: ${error}`)
     }
-  }, [error]);
+  }, [error])
 
   const handleMonthFilterChange = (event: SelectChangeEvent<number>) => {
-    setSelectedMonth(Number(event.target.value));
-  };
+    setSelectedMonth(Number(event.target.value))
+  }
 
   const handleYearFilterChange = (event: SelectChangeEvent<number>) => {
-    setSelectedYear(event.target.value as number);
-  };
+    setSelectedYear(event.target.value as number)
+  }
 
   const handleEditCellChange = async (
     params: GridCellEditStopParams,
     event: MuiEvent,
   ) => {
-    const { field, row } = params;
+    const { field, row } = params
 
-    row.start_date = moment(row.start_date).format('YYYY-MM-DD');
+    row.start_date = moment(row.start_date).format('YYYY-MM-DD')
 
-    row[field] = (event as { target: { value: unknown } }).target.value;
+    row[field] = (event as { target: { value: unknown } }).target.value
     try {
-      await put(`transaction`, row, vars.uri);
-      toast.success('Transaction updated successfully');
+      await put(`transaction`, row, vars.uri)
+      toast.success('Transaction updated successfully')
       await mutate(
         `transactions/${userId}?year=${selectedYear}&month=${selectedMonth}`,
-      );
+      )
     } catch (error) {
-      console.error('Error updating transaction:', error);
-      toast.error('Error updating transaction');
+      console.error('Error updating transaction:', error)
+      toast.error('Error updating transaction')
     }
-  };
+  }
 
   const onClickCsvButton = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
       try {
-        const formData = new FormData();
-        formData.append('file', file, file.name);
-        await postFile('transactions/csv', formData);
+        const formData = new FormData()
+        formData.append('file', file, file.name)
+        await postFile('transactions/csv', formData)
 
-        toast.success('CSV file uploaded successfully');
+        toast.success('CSV file uploaded successfully')
       } catch (error) {
-        toast.error(`Error uploading CSV file: ${error}`);
+        toast.error(`Error uploading CSV file: ${error}`)
       }
     }
-  };
+  }
 
   const getRowClassName = (params: GridRowParams) => {
-    return params.row.type === 0 ? 'type0' : 'type1';
-  };
+    return params.row.type === 0 ? 'type0' : 'type1'
+  }
 
   const columns: GridColDef[] = [
     {
@@ -240,15 +240,15 @@ const HomePage: React.FC = () => {
         <IconButton
           style={{ color: '#bb3a32' }}
           onClick={() => {
-            setConfirmDialogOpen(true);
-            setTransactionIdToDelete(params.row.id);
+            setConfirmDialogOpen(true)
+            setTransactionIdToDelete(params.row.id)
           }}
         >
           <GridDeleteIcon />
         </IconButton>
       ),
     },
-  ];
+  ]
 
   return (
     <article
@@ -261,20 +261,12 @@ const HomePage: React.FC = () => {
       <section
         style={{ display: 'flex', justifyContent: 'flex-end', gap: '2vh' }}
       >
-        <ValueCard
-          value={sumExpenses}
-          title="Despesas"
-          backgroundColor="#bb3a32"
-        />
-        <ValueCard
-          value={sumIncome}
-          title="Receitas"
-          backgroundColor="#437e33"
-        />
+        <ValueCard value={sumExpenses} title="Despesas" backgroundColor="red" />
+        <ValueCard value={sumIncome} title="Receitas" backgroundColor="green" />
         <ValueCard
           value={sumIncome - sumExpenses}
           title="Total Final"
-          backgroundColor="#7f7f7f"
+          backgroundColor="red"
         />
       </section>
       <section
@@ -344,7 +336,7 @@ const HomePage: React.FC = () => {
         onClick={confirmDeleteTransaction}
       />
     </article>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

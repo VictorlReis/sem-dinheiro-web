@@ -18,7 +18,7 @@ function App() {
 
   const Layout = () => {
     return (
-      <div className="main">
+      <div className="font-inter">
         <Navbar />
         <div className="container">
           <Outlet />

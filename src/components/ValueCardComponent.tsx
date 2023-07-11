@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 interface FinalValueCardProps {
-  value: number;
-  backgroundColor?: string;
-  title: string;
+  value: number
+  backgroundColor?: string
+  title: string
 }
 
 const ValueCard: React.FC<FinalValueCardProps> = ({
@@ -13,14 +13,9 @@ const ValueCard: React.FC<FinalValueCardProps> = ({
 }) => {
   return (
     <div
-      style={{
-        border: '1px solid',
-        background: backgroundColor || 'gray',
-        borderRadius: '10px',
-        padding: '1vh 2vh 1vh 2vh',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className={`border-2 ${
+        backgroundColor ? 'bg-' + backgroundColor : 'bg-gray'
+      } rounded-lg py-1vh px-2vh flex flex-col`}
     >
       <span>{title}</span>
       <span style={{ fontSize: '3vh' }}>
@@ -30,7 +25,7 @@ const ValueCard: React.FC<FinalValueCardProps> = ({
         })}
       </span>
     </div>
-  );
-};
+  )
+}
 
-export default ValueCard;
+export default ValueCard
