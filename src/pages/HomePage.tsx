@@ -283,7 +283,7 @@ const HomePage: React.FC = () => {
           marginTop: '3vh',
         }}
       >
-        <section style={{ width: '55%' }}>
+        <section>
           <Grid display="flex" justifyContent="space-between">
             <Button
               startIcon={<AddIcon />}
@@ -325,6 +325,10 @@ const HomePage: React.FC = () => {
             onCellEditStop={handleEditCellChange}
             getRowClassName={getRowClassName}
             className="transaction-grid"
+            initialState={{
+              pagination: { paginationModel: { pageSize: 25 } },
+            }}
+            pageSizeOptions={[5, 10, 25]}
           />
         </section>
         <CustomChart data={chartData} />

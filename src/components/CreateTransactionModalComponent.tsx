@@ -48,82 +48,84 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = (
 
   return (
     <Dialog open={props.open} onClose={props.onClose}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle>Create Transaction</DialogTitle>
-        <DialogContent>
-          <Box>
-            <Input
-              type="text"
-              {...register('description')}
-              placeholder="Description"
-            />
-            <Input
-              type="date"
-              {...register('startDate')}
-              sx={{ marginTop: '2vh' }}
-              placeholder="Start Date"
-            />
-            <Input
-              type="text"
-              {...register('paymentMethod')}
-              sx={{ marginTop: '2vh' }}
-              placeholder="Payment Method"
-            />
-            <Input
-              type="text"
-              {...register('tag')}
-              sx={{ marginTop: '2vh' }}
-              placeholder="Tag"
-            />
-            <Controller
-              name="value"
-              control={control}
-              render={({ field }) => (
-                <CurrencyTextField
-                  style={{ marginTop: '2vh' }}
-                  id="value"
-                  placeholder="Enter amount"
-                  onValueChange={(values) =>
-                    field.onChange(Number(values.value))
-                  }
-                />
-              )}
-            />
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  placeholder="Type"
-                  sx={{ marginTop: '2vh' }}
-                  onChange={(event: SelectChangeEvent<TransactionType>) =>
-                    field.onChange(event.target.value as TransactionType)
-                  }
-                >
-                  <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
-                  <MenuItem value={TransactionType.Income}>Income</MenuItem>
-                </Select>
-              )}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button color="error" onClick={props.onClose}>
-            Cancel
-          </Button>
-          <Button
-            color="success"
-            type="submit"
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault();
-              handleSubmit(onSubmit)();
-            }}
-          >
-            Create
-          </Button>
-        </DialogActions>
-      </form>
+      <div style={{ display: 'flex' }}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogTitle>Create Transaction</DialogTitle>
+          <DialogContent>
+            <Box style={{ display: 'grid', gap: '1vh' }}>
+              <Input
+                type="text"
+                {...register('description')}
+                placeholder="Description"
+              />
+              <Input
+                type="date"
+                {...register('startDate')}
+                sx={{ marginTop: '2vh' }}
+                placeholder="Start Date"
+              />
+              <Input
+                type="text"
+                {...register('paymentMethod')}
+                sx={{ marginTop: '2vh' }}
+                placeholder="Payment Method"
+              />
+              <Input
+                type="text"
+                {...register('tag')}
+                sx={{ marginTop: '2vh' }}
+                placeholder="Tag"
+              />
+              <Controller
+                name="value"
+                control={control}
+                render={({ field }) => (
+                  <CurrencyTextField
+                    style={{ marginTop: '2vh' }}
+                    id="value"
+                    placeholder="Enter amount"
+                    onValueChange={(values) =>
+                      field.onChange(Number(values.value))
+                    }
+                  />
+                )}
+              />
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    placeholder="Type"
+                    sx={{ marginTop: '2vh' }}
+                    onChange={(event: SelectChangeEvent<TransactionType>) =>
+                      field.onChange(event.target.value as TransactionType)
+                    }
+                  >
+                    <MenuItem value={TransactionType.Expense}>Expense</MenuItem>
+                    <MenuItem value={TransactionType.Income}>Income</MenuItem>
+                  </Select>
+                )}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button color="error" onClick={props.onClose}>
+              Cancel
+            </Button>
+            <Button
+              color="success"
+              type="submit"
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                handleSubmit(onSubmit)();
+              }}
+            >
+              Create
+            </Button>
+          </DialogActions>
+        </form>
+      </div>
     </Dialog>
   );
 };
