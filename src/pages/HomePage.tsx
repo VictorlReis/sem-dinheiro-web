@@ -6,6 +6,7 @@ import {
   GridCellEditStopParams,
   GridColDef,
   GridDeleteIcon,
+  GridRowParams,
   GridRowsProp,
 } from '@mui/x-data-grid';
 import moment from 'moment';
@@ -22,6 +23,11 @@ import CustomChart from '../components/CustomChartComponent';
 import CreateTransactionModal from '../components/CreateTransactionModalComponent';
 import ValueCard from '../components/ValueCardComponent';
 import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent';
+
+type ChartData = {
+  tag: string;
+  value: number;
+};
 
 const HomePage: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
@@ -42,26 +48,29 @@ const HomePage: React.FC = () => {
   const [filteredTransactions, setFilteredTransactions] = useState<
     GridRowsProp<Transaction> | undefined
   >(transactions);
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
   const [sumExpenses, setSumExpenses] = useState(0);
   const [sumIncome, setSumIncome] = useState(0);
 
   useEffect(() => {
     if (transactions) {
-      const tagValues = transactions.reduce((acc, transaction) => {
-        if (transaction.type === 1) {
+      const tagValues = transactions.reduce(
+        (acc: { [tag: string]: number }, transaction) => {
+          if (transaction.type === 1) {
+            return acc;
+          }
+
+          if (!acc[transaction.tag]) {
+            acc[transaction.tag] = 0;
+          }
+
+          const valueToAdd =
+            Math.round((transaction.value + Number.EPSILON) * 100) / 100;
+          acc[transaction.tag] += valueToAdd;
           return acc;
-        }
-
-        if (!acc[transaction.tag]) {
-          acc[transaction.tag] = 0;
-        }
-
-        const valueToAdd =
-          Math.round((transaction.value + Number.EPSILON) * 100) / 100;
-        acc[transaction.tag] += valueToAdd;
-        return acc;
-      }, {});
+        },
+        {},
+      );
 
       const data = Object.entries(tagValues).map(([tag, value]) => ({
         tag,
@@ -72,7 +81,7 @@ const HomePage: React.FC = () => {
     }
   }, [transactions]);
 
-  const sumTotal = (transactions) => {
+  const sumTotal = (transactions: readonly Transaction[]) => {
     const { sumExpenses, sumIncome } = transactions.reduce(
       (sums, transaction) => {
         if (transaction.type === 0) {
@@ -143,10 +152,8 @@ const HomePage: React.FC = () => {
     }
   }, [error]);
 
-  const handleMonthFilterChange = (
-    event: React.ChangeEvent<{ value: unknown }>,
-  ) => {
-    setSelectedMonth(event.target.value as number);
+  const handleMonthFilterChange = (event: SelectChangeEvent<number>) => {
+    setSelectedMonth(Number(event.target.value));
   };
 
   const handleYearFilterChange = (event: SelectChangeEvent<number>) => {
@@ -187,12 +194,12 @@ const HomePage: React.FC = () => {
 
         toast.success('CSV file uploaded successfully');
       } catch (error) {
-        toast.error('Error uploading CSV file:', error);
+        toast.error(`Error uploading CSV file: ${error}`);
       }
     }
   };
 
-  const getRowClassName = (params) => {
+  const getRowClassName = (params: GridRowParams) => {
     return params.row.type === 0 ? 'type0' : 'type1';
   };
 
@@ -243,7 +250,6 @@ const HomePage: React.FC = () => {
     },
   ];
 
-  // noinspection TypeScriptValidateTypes
   return (
     <article
       style={{
