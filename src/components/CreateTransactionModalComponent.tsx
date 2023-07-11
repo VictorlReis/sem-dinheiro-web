@@ -1,10 +1,10 @@
 // noinspection TypeScriptValidateTypes
 
-import React from 'react';
+import React from 'react'
 import {
   CreateTransactionValues,
   TransactionType,
-} from '../interfaces/Transactions';
+} from '../interfaces/Transactions'
 import {
   Box,
   Button,
@@ -16,17 +16,17 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-} from '@mui/material';
-import CurrencyTextField from './CurrencyTextField';
-import { Controller, useForm } from 'react-hook-form';
-import moment from 'moment';
+} from '@mui/material'
+import CurrencyTextField from './CurrencyTextField'
+import { Controller, useForm } from 'react-hook-form'
+import moment from 'moment'
 
 interface CreateTransactionModalProps {
-  open: boolean;
-  onClose: () => void;
+  open: boolean
+  onClose: () => void
   handleCreateTransaction: (
     formValues: CreateTransactionValues,
-  ) => Promise<void>;
+  ) => Promise<void>
 }
 
 const CreateTransactionModal: React.FC<CreateTransactionModalProps> = (
@@ -39,12 +39,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = (
         type: TransactionType.Expense,
         startDate: moment().format('YYYY-MM-DD'),
       },
-    });
+    })
 
   const onSubmit = async (data: CreateTransactionValues) => {
-    await props.handleCreateTransaction(data);
-    reset();
-  };
+    await props.handleCreateTransaction(data)
+    reset()
+  }
 
   return (
     <Dialog open={props.open} onClose={props.onClose}>
@@ -117,8 +117,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = (
               color="success"
               type="submit"
               onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.preventDefault();
-                handleSubmit(onSubmit)();
+                e.preventDefault()
+                handleSubmit(onSubmit)()
               }}
             >
               Create
@@ -127,7 +127,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = (
         </form>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default CreateTransactionModal;
+export default CreateTransactionModal
