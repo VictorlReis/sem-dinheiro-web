@@ -14,11 +14,11 @@ const ValueCard: React.FC<FinalValueCardProps> = ({
   return (
     <div
       className={`border-2 ${
-        backgroundColor ? 'bg-' + backgroundColor : 'bg-gray'
-      } rounded-lg py-1vh px-2vh flex flex-col`}
+        backgroundColor ? backgroundColor : 'bg-stone-500'
+      } rounded-lg py-1vh px-2vh flex flex-col pr-4 pt-2 pb-2 pl-4`}
     >
       <span>{title}</span>
-      <span style={{ fontSize: '3vh' }}>
+      <span className="text-3xl">
         {value.toLocaleString('pt-BR', {
           style: 'currency',
           currency: 'BRL',

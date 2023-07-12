@@ -11,7 +11,7 @@ import {
   MuiEvent,
 } from '@mui/x-data-grid'
 import moment from 'moment'
-import { Button, Grid, IconButton, SelectChangeEvent } from '@mui/material'
+import { Grid, IconButton, SelectChangeEvent } from '@mui/material'
 import { get, post, postFile, put, remove } from '../hooks/fetch'
 import useSWR, { mutate } from 'swr'
 import {
@@ -24,6 +24,7 @@ import CustomChart from '../components/CustomChartComponent'
 import CreateTransactionModal from '../components/CreateTransactionModalComponent'
 import ValueCard from '../components/ValueCardComponent'
 import ConfirmDeleteModalComponent from '../components/ConfirmDeleteModalComponent'
+import DefaultButton from '../components/DefaultButton'
 
 type ChartData = {
   tag: string
@@ -251,55 +252,31 @@ const HomePage: React.FC = () => {
   ]
 
   return (
-    <article
-      style={{
-        justifyContent: 'center',
-        marginTop: '5vh',
-        display: 'grid',
-      }}
-    >
-      <section
-        style={{ display: 'flex', justifyContent: 'flex-end', gap: '2vh' }}
-      >
+    <article className="flex justify-center mt-10 grid">
+      <section className="flex justify-end gap-8">
         <ValueCard value={sumExpenses} title="Despesas" backgroundColor="red" />
         <ValueCard value={sumIncome} title="Receitas" backgroundColor="green" />
-        <ValueCard
-          value={sumIncome - sumExpenses}
-          title="Total Final"
-          backgroundColor="red"
-        />
+        <ValueCard value={sumIncome - sumExpenses} title="Total Final" />
       </section>
-      <section
-        style={{
-          display: 'flex',
-          marginTop: '3vh',
-        }}
-      >
+      <section className="flex mt-6">
         <section>
           <Grid display="flex" justifyContent="space-between">
-            <Button
-              startIcon={<AddIcon />}
-              variant="outlined"
-              color="success"
+            <DefaultButton
               onClick={() => setOpenCreateTransactionModal(true)}
-              style={{ marginBottom: '1vh' }}
-            >
-              Nova Transação
-            </Button>
-            <Button
-              component="label"
-              variant="outlined"
               color="success"
-              style={{ marginBottom: '1vh' }}
             >
+              <AddIcon className="mr-2" />
+              Nova Transação
+            </DefaultButton>
+            <DefaultButton color="success">
               Importar CSV
               <input
                 type="file"
                 accept=".csv"
-                style={{ display: 'none' }}
                 onChange={(e) => onClickCsvButton(e)}
+                className="opacity-0 absolute -left-9999"
               />
-            </Button>
+            </DefaultButton>
             <DateFilter
               selectedMonth={selectedMonth}
               selectedYear={selectedYear}
