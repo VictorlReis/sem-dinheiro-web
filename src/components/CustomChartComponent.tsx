@@ -1,6 +1,5 @@
 // noinspection TypeScriptValidateTypes
-import React from 'react';
-import { ResponsivePie } from '@nivo/pie';
+import { ResponsivePie } from '@nivo/pie'
 
 const CustomChart = ({ data }) => {
   const theme = {
@@ -14,10 +13,10 @@ const CustomChart = ({ data }) => {
         background: '#333333',
       },
     },
-  };
+  }
 
   return (
-    <div style={{ width: '48rem', height: '50rem' }}>
+    <div style={{ width: '50em', height: '100%' }}>
       <ResponsivePie
         data={data.map((item) => ({
           id: item.tag,
@@ -31,7 +30,7 @@ const CustomChart = ({ data }) => {
         cornerRadius={3}
       />
     </div>
-  );
-};
+  )
+}
 
-export default CustomChart;
+export default CustomChart

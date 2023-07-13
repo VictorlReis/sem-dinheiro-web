@@ -258,17 +258,17 @@ const HomePage: React.FC = () => {
         <ValueCard value={sumIncome} title="Receitas" backgroundColor="green" />
         <ValueCard value={sumIncome - sumExpenses} title="Total Final" />
       </section>
-      <section className="flex mt-6">
-        <section>
+      <section className="flex mt-3">
+        <section className="w-30 h-72">
           <Grid display="flex" justifyContent="space-between">
             <DefaultButton
               onClick={() => setOpenCreateTransactionModal(true)}
-              color="success"
+              color="default"
             >
               <AddIcon className="mr-2" />
               Nova Transação
             </DefaultButton>
-            <DefaultButton color="success">
+            <DefaultButton color="default">
               Importar CSV
               <input
                 type="file"
@@ -290,14 +290,14 @@ const HomePage: React.FC = () => {
             sx={{
               marginBottom: '1vh',
               overflow: 'none',
+              maxWidth: '100%',
+              color: '#f8f8f2',
             }}
             onCellEditStop={handleEditCellChange}
             getRowClassName={getRowClassName}
+            autoPageSize={true}
+            autoHeight={true}
             className="transaction-grid"
-            initialState={{
-              pagination: { paginationModel: { pageSize: 25 } },
-            }}
-            pageSizeOptions={[5, 10, 25]}
           />
         </section>
         <CustomChart data={chartData} />

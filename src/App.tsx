@@ -3,27 +3,25 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { createTheme, ThemeProvider } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
-import Navbar from './components/navbar/Navbar'
-import Footer from './components/footer/Footer'
 import Dashboard from './pages/Dashboard'
+import Menu from './components/menu/Menu'
 
 function App() {
-  const darkTheme = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  })
-
   const Layout = () => {
     return (
-      <div className="font-inter">
-        <Navbar />
-        <div className="container">
-          <Outlet />
+      <div className="h-full bg-primary text-foreground">
+        <div className="flex font-inter bg-primary">
+          <div className="bg-secondary w-48 h-screen">
+            <Menu />
+          </div>
+          <div className="w-full">
+            <div className="bg-secondary h-16">
+              <a>teste</a>
+            </div>
+            <Outlet />
+          </div>
         </div>
-        <Footer />
       </div>
     )
   }
@@ -44,7 +42,7 @@ function App() {
   ])
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <>
       <CssBaseline />
       <RouterProvider router={router} />
       <ToastContainer
@@ -59,7 +57,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
-    </ThemeProvider>
+    </>
   )
 }
 
